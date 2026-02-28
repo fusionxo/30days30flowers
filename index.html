@@ -62,10 +62,14 @@
         <!-- Content area -->
         <div class="text-center">
             
-            <!-- Progress Indicator -->
-            <div class="mb-5">
-                <p id="progress-text" class="text-xs font-bold uppercase tracking-widest opacity-60 mb-2">Day 1 / 30</p>
-                <p id="progress-bar" class="text-sm tracking-[0.15em] opacity-80 break-all leading-relaxed px-2"></p>
+            <!-- Sleek Progress Indicator -->
+            <div class="mb-6 px-2">
+                <p id="progress-text" class="text-xs font-bold uppercase tracking-widest opacity-60 mb-3">Day 1 of 30</p>
+                <!-- Bar Background -->
+                <div class="h-2 w-full bg-black/5 rounded-full overflow-hidden shadow-inner">
+                    <!-- Animated Fill -->
+                    <div id="progress-fill" class="h-full bg-current opacity-70 rounded-full transition-all duration-1000 ease-out" style="width: 0%"></div>
+                </div>
             </div>
 
             <h1 id="flower-name" class="text-3xl md:text-4xl font-elegant font-bold mb-2">Flower Name</h1>
@@ -92,11 +96,9 @@
 
     <script>
         // --- 1. THE DAILY DATABASE ---
-        // Every day you can change the text, image, and colors!
         const flowerData = {
             1: {
                 flower: "Daisy",
-                // IMPORTANT: Create an "images" folder, rename your uploaded image to "daisy.png", and put it inside!
                 image: "images/daisy.png", 
                 message: "Day 1: Starting simple and sweet. A little daisy to kick off our 30 days of flowers. You make every day brighter!",
                 question: "What is your absolute favorite memory of us so far?",
@@ -106,12 +108,12 @@
                     text: "text-amber-900",
                     badgeBg: "bg-amber-400",
                     badgeText: "text-amber-900",
-                    fontMsg: "font-handwriting text-2xl" // Gives it a handwritten love-letter feel
+                    fontMsg: "font-handwriting text-2xl" 
                 }
             },
             2: {
                 flower: "Tulip",
-                image: "images/tulip.png", // Placeholder for tomorrow's image
+                image: "images/tulip.png",
                 message: "Day 2: A beautiful tulip for a beautiful girl. Fun fact: Tulips keep growing even after they are cut, just like my love for you. (Cheesy? Maybe a little).",
                 question: "If we could teleport anywhere in the world right now for a date, where would we go?",
                 theme: {
@@ -120,18 +122,16 @@
                     text: "text-pink-900",
                     badgeBg: "bg-pink-500",
                     badgeText: "text-white",
-                    fontMsg: "font-modern text-lg font-light" // Clean, modern text
+                    fontMsg: "font-modern text-lg font-light"
                 }
             }
-            // We will add Day 3 through 30 here as we go!
+            // Add Day 3 through 30 here as you go!
         };
 
         // --- 2. GET THE CURRENT DAY ---
-        // Reads ?day=1 from the URL link you send her
         const urlParams = new URLSearchParams(window.location.search);
         let currentDay = parseInt(urlParams.get('day'));
 
-        // Default to Day 1 if the link is broken or missing
         if (!currentDay || !flowerData[currentDay]) {
             currentDay = 1; 
         }
@@ -147,21 +147,21 @@
             
             const msgElement = document.getElementById('love-message');
             msgElement.innerText = data.message;
-            msgElement.className = `leading-relaxed mb-6 ${data.theme.fontMsg}`; // Apply specific font
+            msgElement.className = `leading-relaxed mb-6 ${data.theme.fontMsg}`; 
             
             // Update Image
             document.getElementById('flower-image').src = data.image;
 
             // Update Progress Indicator
-            document.getElementById('progress-text').innerText = `Day ${currentDay} / 30`;
-            let progressString = '';
-            for (let i = 1; i <= 30; i++) {
-                progressString += (i <= currentDay) ? '🌸' : '□';
-            }
-            document.getElementById('progress-bar').innerText = progressString;
+            document.getElementById('progress-text').innerText = `Day ${currentDay} of 30`;
+            
+            // Add a tiny delay so the progress bar smoothly animates from 0% when the page loads
+            setTimeout(() => {
+                const progressPercentage = (currentDay / 30) * 100;
+                document.getElementById('progress-fill').style.width = `${progressPercentage}%`;
+            }, 100);
 
             // Update Daily Question
-            // (If you forget to add a question one day, it defaults to a cute fallback!)
             document.getElementById('daily-question').innerText = data.question || "What made you smile today?";
 
             // Apply Themes (Colors)
@@ -180,7 +180,7 @@
             }
         });
 
-        // Confetti Function for the finale
+        // Confetti Function
         function shootConfetti() {
             var duration = 3 * 1000;
             var animationEnd = Date.now() + duration;
