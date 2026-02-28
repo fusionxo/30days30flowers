@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>30 Days of Flowers For You</title>
+    
+    <!-- Tailwind CSS for styling -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Google Fonts for different daily vibes -->
+    <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@500;700&family=Playfair+Display:ital,wght@0,400;0,600;1,400&family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    
+    <!-- Confetti script (ready for the Day 30 finale!) -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+    <style>
+        /* Custom Fonts */
+        .font-handwriting { font-family: 'Caveat', cursive; }
+        .font-elegant { font-family: 'Playfair Display', serif; }
+        .font-modern { font-family: 'Poppins', sans-serif; }
+
+        /* Smooth transitions for when the day changes */
+        body { transition: background-color 1s ease; }
+        .dynamic-element { transition: all 0.8s ease; }
+
+        /* Cute animations */
+        @keyframes float {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+            100% { transform: translateY(0px); }
+        }
+        .animate-float { animation: float 4s ease-in-out infinite; }
+        
+        @keyframes heartbeat {
+            0%, 100% { transform: scale(1); }
+            25% { transform: scale(1.1); }
+            50% { transform: scale(1); }
+            75% { transform: scale(1.1); }
+        }
+        .animate-heartbeat { animation: heartbeat 1.5s infinite; display: inline-block; }
+    </style>
+</head>
+<body id="app-body" class="min-h-screen flex items-center justify-center p-4 bg-gray-50 text-gray-800 font-modern">
+
+    <!-- Main Card Container -->
+    <main id="card-container" class="relative max-w-md w-full bg-white rounded-3xl p-6 md:p-8 shadow-2xl opacity-0 transform translate-y-8 transition-all duration-1000 ease-out">
+        
+        <!-- Day Badge -->
+        <div class="absolute -top-4 -left-4 md:-left-6">
+            <div id="day-badge" class="bg-black text-white rounded-full h-16 w-16 flex flex-col items-center justify-center shadow-lg transform rotate-[-10deg]">
+                <span class="text-xs font-bold uppercase tracking-widest opacity-80">Day</span>
+                <span id="day-number" class="text-2xl font-bold leading-none">1</span>
+            </div>
+        </div>
+
+        <!-- Flower Image -->
+        <div class="relative w-full aspect-square rounded-2xl overflow-hidden mb-6 shadow-inner bg-gray-100 flex items-center justify-center">
+            <img id="flower-image" src="" alt="Daily Flower" class="object-cover w-full h-full animate-float" onerror="this.src='https://images.unsplash.com/photo-1601412436009-d964bd02edbc?q=80&w=600&auto=format&fit=crop';">
+        </div>
+
+        <!-- Content area -->
+        <div class="text-center">
+            
+            <!-- Progress Indicator -->
+            <div class="mb-5">
+                <p id="progress-text" class="text-xs font-bold uppercase tracking-widest opacity-60 mb-2">Day 1 / 30</p>
+                <p id="progress-bar" class="text-sm tracking-[0.15em] opacity-80 break-all leading-relaxed px-2"></p>
+            </div>
+
+            <h1 id="flower-name" class="text-3xl md:text-4xl font-elegant font-bold mb-2">Flower Name</h1>
+            
+            <div class="w-12 h-1 bg-current mx-auto mb-6 opacity-30 rounded-full"></div>
+            
+            <p id="love-message" class="text-lg md:text-xl leading-relaxed mb-6">
+                Message goes here...
+            </p>
+            
+            <div class="text-2xl animate-heartbeat text-current opacity-80">
+                🤍
+            </div>
+
+            <!-- Daily Question -->
+            <div class="mt-8 p-4 rounded-2xl bg-white/40 border border-current/20 backdrop-blur-sm shadow-sm transition-all duration-500 hover:bg-white/60">
+                <p class="text-xs font-bold uppercase tracking-widest opacity-60 mb-2">Question of the day</p>
+                <p id="daily-question" class="text-sm md:text-base italic font-medium opacity-90"></p>
+            </div>
+
+        </div>
+        
+    </main>
+
+    <script>
+        // --- 1. THE DAILY DATABASE ---
+        // Every day you can change the text, image, and colors!
+        const flowerData = {
+            1: {
+                flower: "Daisy",
+                // IMPORTANT: Create an "images" folder, rename your uploaded image to "daisy.png", and put it inside!
+                image: "images/daisy.png", 
+                message: "Day 1: Starting simple and sweet. A little daisy to kick off our 30 days of flowers. You make every day brighter!",
+                question: "What is your absolute favorite memory of us so far?",
+                theme: {
+                    background: "bg-[#fdfbf7]", // Creamy paper background
+                    card: "bg-white shadow-[0_20px_50px_rgba(234,179,8,0.1)] border border-amber-50",
+                    text: "text-amber-900",
+                    badgeBg: "bg-amber-400",
+                    badgeText: "text-amber-900",
+                    fontMsg: "font-handwriting text-2xl" // Gives it a handwritten love-letter feel
+                }
+            },
+            2: {
+                flower: "Tulip",
+                image: "images/tulip.png", // Placeholder for tomorrow's image
+                message: "Day 2: A beautiful tulip for a beautiful girl. Fun fact: Tulips keep growing even after they are cut, just like my love for you. (Cheesy? Maybe a little).",
+                question: "If we could teleport anywhere in the world right now for a date, where would we go?",
+                theme: {
+                    background: "bg-pink-50",
+                    card: "bg-white shadow-[0_20px_50px_rgba(236,72,153,0.15)] border border-pink-100",
+                    text: "text-pink-900",
+                    badgeBg: "bg-pink-500",
+                    badgeText: "text-white",
+                    fontMsg: "font-modern text-lg font-light" // Clean, modern text
+                }
+            }
+            // We will add Day 3 through 30 here as we go!
+        };
+
+        // --- 2. GET THE CURRENT DAY ---
+        // Reads ?day=1 from the URL link you send her
+        const urlParams = new URLSearchParams(window.location.search);
+        let currentDay = parseInt(urlParams.get('day'));
+
+        // Default to Day 1 if the link is broken or missing
+        if (!currentDay || !flowerData[currentDay]) {
+            currentDay = 1; 
+        }
+
+        const data = flowerData[currentDay];
+
+        // --- 3. UPDATE THE WEBSITE ---
+        window.addEventListener('DOMContentLoaded', () => {
+            
+            // Update Text
+            document.getElementById('day-number').innerText = currentDay;
+            document.getElementById('flower-name').innerText = data.flower;
+            
+            const msgElement = document.getElementById('love-message');
+            msgElement.innerText = data.message;
+            msgElement.className = `leading-relaxed mb-6 ${data.theme.fontMsg}`; // Apply specific font
+            
+            // Update Image
+            document.getElementById('flower-image').src = data.image;
+
+            // Update Progress Indicator
+            document.getElementById('progress-text').innerText = `Day ${currentDay} / 30`;
+            let progressString = '';
+            for (let i = 1; i <= 30; i++) {
+                progressString += (i <= currentDay) ? '🌸' : '□';
+            }
+            document.getElementById('progress-bar').innerText = progressString;
+
+            // Update Daily Question
+            // (If you forget to add a question one day, it defaults to a cute fallback!)
+            document.getElementById('daily-question').innerText = data.question || "What made you smile today?";
+
+            // Apply Themes (Colors)
+            const body = document.getElementById('app-body');
+            const card = document.getElementById('card-container');
+            const badge = document.getElementById('day-badge');
+
+            // Reset old classes and apply new ones
+            body.className = `min-h-screen flex items-center justify-center p-4 transition-colors duration-1000 ${data.theme.background} ${data.theme.text}`;
+            card.className = `relative max-w-md w-full rounded-3xl p-6 md:p-8 transform transition-all duration-1000 ease-out translate-y-0 opacity-100 ${data.theme.card}`;
+            badge.className = `absolute -top-4 -left-4 md:-left-6 rounded-full h-16 w-16 flex flex-col items-center justify-center shadow-lg transform rotate-[-10deg] ${data.theme.badgeBg} ${data.theme.badgeText}`;
+
+            // Trigger confetti if it's Day 30!
+            if (currentDay === 30) {
+                setTimeout(shootConfetti, 500);
+            }
+        });
+
+        // Confetti Function for the finale
+        function shootConfetti() {
+            var duration = 3 * 1000;
+            var animationEnd = Date.now() + duration;
+            var defaults = { startVelocity: 30, spread: 360, ticks: 60, zIndex: 0 };
+
+            function randomInRange(min, max) {
+                return Math.random() * (max - min) + min;
+            }
+
+            var interval = setInterval(function() {
+                var timeLeft = animationEnd - Date.now();
+                if (timeLeft <= 0) { return clearInterval(interval); }
+                var particleCount = 50 * (timeLeft / duration);
+                
+                confetti(Object.assign({}, defaults, { particleCount, origin: { x: randomInRange(0.1, 0.3), y: Math.random() - 0.2 } }));
+                confetti(Object.assign({}, defaults, { particleCount, origin: { x: randomInRange(0.7, 0.9), y: Math.random() - 0.2 } }));
+            }, 250);
+        }
+    </script>
+</body>
+</html>
