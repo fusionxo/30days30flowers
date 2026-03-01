@@ -96,9 +96,11 @@
 
     <script>
         // --- 1. THE DAILY DATABASE ---
+        // Every day you can change the text, image, and colors!
         const flowerData = {
             1: {
                 flower: "Daisy",
+                // IMPORTANT: Create an "images" folder, rename your uploaded image to "daisy.png", and put it inside!
                 image: "images/daisy.png", 
                 message: "Day 1: Starting simple and sweet. A little daisy to kick off our 30 days of flowers. You make every day brighter!",
                 question: "What is your absolute favorite memory of us so far?",
@@ -115,23 +117,25 @@
                 flower: "Tulip",
                 image: "images/tulip.png",
                 message: "Day 2: A beautiful tulip for a beautiful girl. Fun fact: Tulips keep growing even after they are cut, just like my love for you. (Cheesy? Maybe a little).",
-                question: "If we could teleport anywhere in the world right now for a date, where would we go?",
+                question: "What was your first impression of me?",
                 theme: {
                     background: "bg-pink-50",
                     card: "bg-white shadow-[0_20px_50px_rgba(236,72,153,0.15)] border border-pink-100",
-                    text: "text-pink-900",
-                    badgeBg: "bg-pink-500",
+                    text: "text-fuchsia-950",
+                    badgeBg: "bg-fuchsia-500 shadow-lg shadow-fuchsia-500/40", // Glowing pink badge
                     badgeText: "text-white",
-                    fontMsg: "font-modern text-lg font-light"
+                    fontMsg: "font-elegant text-xl italic" // Elegant, book-like font instead of handwriting
                 }
             }
             // Add Day 3 through 30 here as you go!
         };
 
         // --- 2. GET THE CURRENT DAY ---
+        // Reads ?day=1 from the URL link you send her
         const urlParams = new URLSearchParams(window.location.search);
         let currentDay = parseInt(urlParams.get('day'));
 
+        // Default to Day 1 if the link is broken or missing
         if (!currentDay || !flowerData[currentDay]) {
             currentDay = 1; 
         }
@@ -147,7 +151,7 @@
             
             const msgElement = document.getElementById('love-message');
             msgElement.innerText = data.message;
-            msgElement.className = `leading-relaxed mb-6 ${data.theme.fontMsg}`; 
+            msgElement.className = `leading-relaxed mb-6 ${data.theme.fontMsg}`; // Apply specific font
             
             // Update Image
             document.getElementById('flower-image').src = data.image;
@@ -180,7 +184,7 @@
             }
         });
 
-        // Confetti Function
+        // Confetti Function for the finale
         function shootConfetti() {
             var duration = 3 * 1000;
             var animationEnd = Date.now() + duration;
