@@ -1,0 +1,669 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>30 Days of Flowers For You</title>
+    
+    <!-- Tailwind CSS for styling -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Google Fonts for different daily vibes -->
+    <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@500;700&family=Playfair+Display:ital,wght@0,400;0,600;1,400&family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    
+    <!-- Confetti script (ready for the Day 30 finale!) -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+    <style>
+        /* Custom Fonts */
+        .font-handwriting { font-family: 'Caveat', cursive; }
+        .font-elegant { font-family: 'Playfair Display', serif; }
+        .font-modern { font-family: 'Poppins', sans-serif; }
+
+        /* Smooth transitions for when the day changes */
+        body { transition: background-color 1s ease; }
+        .dynamic-element { transition: all 0.8s ease; }
+
+        /* Cute animations */
+        @keyframes float {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+            100% { transform: translateY(0px); }
+        }
+        .animate-float { animation: float 4s ease-in-out infinite; }
+        
+        @keyframes heartbeat {
+            0%, 100% { transform: scale(1); }
+            25% { transform: scale(1.1); }
+            50% { transform: scale(1); }
+            75% { transform: scale(1.1); }
+        }
+        .animate-heartbeat { animation: heartbeat 1.5s infinite; display: inline-block; }
+    </style>
+</head>
+<body id="app-body" class="min-h-screen flex items-center justify-center p-4 bg-gray-50 text-gray-800 font-modern">
+
+    <!-- Main Card Container -->
+    <main id="card-container" class="relative max-w-md w-full bg-white rounded-3xl p-6 md:p-8 shadow-2xl opacity-0 transform translate-y-8 transition-all duration-1000 ease-out">
+        
+        <!-- Day Badge -->
+        <div class="absolute -top-4 -left-4 md:-left-6">
+            <div id="day-badge" class="bg-black text-white rounded-full h-16 w-16 flex flex-col items-center justify-center shadow-lg transform rotate-[-10deg]">
+                <span class="text-xs font-bold uppercase tracking-widest opacity-80">Day</span>
+                <span id="day-number" class="text-2xl font-bold leading-none">1</span>
+            </div>
+        </div>
+
+        <!-- Flower Image -->
+        <div class="relative w-full aspect-square rounded-2xl overflow-hidden mb-6 shadow-inner bg-gray-100 flex items-center justify-center">
+            <img id="flower-image" src="" alt="Daily Flower" class="object-cover w-full h-full animate-float" onerror="this.src='https://images.unsplash.com/photo-1601412436009-d964bd02edbc?q=80&w=600&auto=format&fit=crop';">
+        </div>
+
+        <!-- Content area -->
+        <div class="text-center">
+            
+            <!-- Sleek Progress Indicator -->
+            <div class="mb-6 px-2">
+                <p id="progress-text" class="text-xs font-bold uppercase tracking-widest opacity-60 mb-3">Day 1 of 30</p>
+                <!-- Bar Background -->
+                <div class="h-2 w-full bg-black/5 rounded-full overflow-hidden shadow-inner">
+                    <!-- Animated Fill -->
+                    <div id="progress-fill" class="h-full bg-current opacity-70 rounded-full transition-all duration-1000 ease-out" style="width: 0%"></div>
+                </div>
+            </div>
+
+            <h1 id="flower-name" class="text-3xl md:text-4xl font-elegant font-bold mb-2">Flower Name</h1>
+            
+            <div class="w-12 h-1 bg-current mx-auto mb-6 opacity-30 rounded-full"></div>
+            
+            <p id="love-message" class="text-lg md:text-xl leading-relaxed mb-6">
+                Message goes here...
+            </p>
+            
+            <div class="text-2xl animate-heartbeat text-current opacity-80">
+                🤍
+            </div>
+
+            <!-- Daily Question -->
+            <div class="mt-8 p-4 rounded-2xl bg-white/40 border border-current/20 backdrop-blur-sm shadow-sm transition-all duration-500 hover:bg-white/60">
+                <p class="text-xs font-bold uppercase tracking-widest opacity-60 mb-2">Question of the day</p>
+                <p id="daily-question" class="text-sm md:text-base italic font-medium opacity-90"></p>
+            </div>
+
+        </div>
+        
+    </main>
+
+    <script>
+        // --- 1. THE DAILY DATABASE ---
+        // Every day you can change the text, image, and colors!
+        const flowerData = {
+            1: {
+                flower: "Daisy",
+                // IMPORTANT: Create an "images" folder, rename your uploaded image to "daisy.png", and put it inside!
+                image: "images/daisy.png", 
+                message: "Day 1: Starting simple and sweet. A little daisy to kick off our 30 days of flowers. You make every day brighter!",
+                question: "What is your absolute favorite memory of us so far?",
+                theme: {
+                    background: "bg-[#fdfbf7]", // Creamy paper background
+                    card: "bg-white shadow-[0_20px_50px_rgba(234,179,8,0.1)] border border-amber-50",
+                    text: "text-amber-900",
+                    badgeBg: "bg-amber-400",
+                    badgeText: "text-amber-900",
+                    fontMsg: "font-handwriting text-2xl" 
+                }
+            },
+            2: {
+                flower: "Tulip",
+                image: "images/tulip.png",
+                message: "Day 2: A beautiful tulip for a beautiful girl. Fun fact: Tulips keep growing even after they are cut, just like my love for you. (Cheesy? Maybe a little).",
+                question: "What was your first impression of me?",
+                theme: {
+                    background: "bg-pink-50",
+                    card: "bg-white shadow-[0_20px_50px_rgba(236,72,153,0.15)] border border-pink-100",
+                    text: "text-fuchsia-950",
+                    badgeBg: "bg-fuchsia-500 shadow-lg shadow-fuchsia-500/40", // Glowing pink badge
+                    badgeText: "text-white",
+                    fontMsg: "font-elegant text-xl italic" // Elegant, book-like font instead of handwriting
+                }
+            },
+            3: {
+                flower: "Lily of the Valley",
+                image: "images/lilyofvalley.png",
+                message: "Day 3: A delicate Lily of the Valley. They symbolize sweetness and happiness. Every little moment with you feels like a sweet, happy discovery.",
+                question: "What is one small thing I do that makes you smile?",
+                theme: {
+                    background: "bg-gradient-to-br from-green-50 to-emerald-100", // Soft woodland green
+                    card: "bg-white/80 backdrop-blur-md shadow-[0_15px_40px_rgba(16,185,129,0.15)] border border-emerald-100", // Delicate frosted card
+                    text: "text-emerald-950",
+                    badgeBg: "bg-emerald-500 shadow-lg shadow-emerald-500/30",
+                    badgeText: "text-white",
+                    fontMsg: "font-modern text-lg font-medium" // Clean and sweet
+                }
+            },
+            4: {
+                flower: "Peony",
+                image: "images/peony.png",
+                message: "Day 4: A gorgeous peony today! They are lush and full of life, just like the beautiful energy you bring everywhere you go.",
+                question: "If we could go anywhere together tomorrow, where would you pick?",
+                theme: {
+                    background: "bg-gradient-to-r from-rose-100 to-teal-50", // Soft, romantic blend
+                    card: "bg-white shadow-[0_10px_40px_rgba(225,29,72,0.1)] border border-rose-100 rounded-[2rem]", // Softer corners
+                    text: "text-rose-900",
+                    badgeBg: "bg-rose-400 shadow-md shadow-rose-400/50",
+                    badgeText: "text-white",
+                    fontMsg: "font-elegant text-xl" 
+                }
+            },
+            5: {
+                flower: "Forget-Me-Not",
+                image: "images/forgetmenot.png",
+                message: "Day 5: Little blue Forget-Me-Nots. A tiny, beautiful reminder that you are always on my mind and in my heart, no matter where we are.",
+                question: "What song reminds you of me the most?",
+                theme: {
+                    background: "bg-gradient-to-br from-blue-50 to-indigo-100", // Soft periwinkle and blue
+                    card: "bg-white/90 backdrop-blur-sm shadow-[0_15px_30px_rgba(99,102,241,0.15)] border-l-4 border-indigo-400", // Fresh left-border design
+                    text: "text-indigo-950",
+                    badgeBg: "bg-indigo-500 shadow-lg shadow-indigo-500/30",
+                    badgeText: "text-white",
+                    fontMsg: "font-handwriting text-2xl tracking-wide" // Sweet handwriting vibe
+                }
+            },
+            6: {
+                flower: "Carnation",
+                image: "images/carnation.png",
+                message: "Day 6: Sweet, ruffled carnations! They symbolize fascination and admiration, which is exactly how I look at you every single day.",
+                question: "What is something about me that you think other people don't notice?",
+                theme: {
+                    background: "bg-gradient-to-tr from-orange-50 to-red-50", // Warm peachy/coral vibe
+                    card: "bg-white/90 backdrop-blur-sm shadow-[0_15px_30px_rgba(234,88,12,0.15)] border-b-4 border-orange-400", // Bottom border accent
+                    text: "text-orange-950",
+                    badgeBg: "bg-orange-500 shadow-lg shadow-orange-500/30",
+                    badgeText: "text-white",
+                    fontMsg: "font-modern text-lg leading-relaxed" // Clean and modern
+                }
+            },
+            7: {
+                flower: "Orchid",
+                image: "images/orchid.png",
+                message: "Day 7: An elegant Orchid. They are rare, exotic, and beautifully unique—just like the connection we share. You are truly one of a kind.",
+                question: "What moment made you feel closest to me?",
+                theme: {
+                    background: "bg-gradient-to-br from-fuchsia-50 to-purple-100", // Elegant lavender/purple
+                    card: "bg-white/90 backdrop-blur-sm shadow-[0_15px_40px_rgba(168,85,247,0.15)] border border-purple-200 rounded-tr-[3rem] rounded-bl-[3rem]", // Unique opposite rounded corners
+                    text: "text-purple-950",
+                    badgeBg: "bg-purple-500 shadow-lg shadow-purple-500/40",
+                    badgeText: "text-white",
+                    fontMsg: "font-elegant text-xl leading-relaxed" // Sophisticated and smooth
+                }
+            },
+            8: {
+                flower: "Hydrangea",
+                image: "images/hydrangea.png",
+                message: "Day 8: Beautiful, blooming Hydrangeas! Today is International Women's Day, and I want to celebrate YOU. I am constantly in awe of your mind, your strength, and the incredible woman you are. I'm so proud to be yours.",
+                question: "What is one thing you love about our conversations?",
+                theme: {
+                    background: "bg-gradient-to-br from-fuchsia-100 via-purple-50 to-pink-100", // Regal, empowering IWD colors
+                    card: "bg-white/95 backdrop-blur-md shadow-[0_20px_60px_rgba(192,38,211,0.25)] border-2 border-fuchsia-300 rounded-[2.5rem]", // Extra special framing
+                    text: "text-fuchsia-950",
+                    badgeBg: "bg-fuchsia-600 shadow-xl shadow-fuchsia-500/50",
+                    badgeText: "text-white",
+                    fontMsg: "font-elegant text-xl font-medium leading-relaxed" 
+                }
+            },
+            9: {
+                flower: "Nargis (Daffodil)",
+                image: "images/daffodil.png",
+                message: "Day 9: A bright and beautiful Nargis. They are the ultimate symbol of spring and new beginnings. Just like the morning sun, you bring so much warmth, light, and hope into my life.",
+                question: "When do you miss me the most?",
+                theme: {
+                    background: "bg-gradient-to-tr from-yellow-50 to-amber-100", // Sunny, cheerful yellow
+                    card: "bg-white/90 backdrop-blur-md shadow-[0_15px_40px_rgba(251,191,36,0.15)] border-t-4 border-b-4 border-yellow-300 rounded-2xl", // Double border top and bottom
+                    text: "text-amber-950",
+                    badgeBg: "bg-yellow-400 shadow-lg shadow-yellow-400/40",
+                    badgeText: "text-amber-950",
+                    fontMsg: "font-handwriting text-2xl tracking-wide" // Handwritten style
+                }
+            },
+            10: {
+                flower: "Ranunculus",
+                image: "images/ranunculus.png",
+                message: "Day 10: A mesmerizing Ranunculus. With their endless layers of delicate petals, they symbolize radiant charm. Just like this flower, I find myself discovering new layers to love about you every single day.",
+                question: "What is something you wish we could do together more often?",
+                theme: {
+                    background: "bg-gradient-to-br from-slate-50 to-rose-100", // Soft slate and blush pink
+                    card: "bg-white/80 backdrop-blur-md shadow-[0_15px_30px_rgba(225,29,72,0.1)] border-2 border-dashed border-rose-300 rounded-3xl", // Cute dashed border
+                    text: "text-slate-800",
+                    badgeBg: "bg-rose-400 shadow-lg shadow-rose-400/40",
+                    badgeText: "text-white",
+                    fontMsg: "font-modern text-lg leading-relaxed" 
+                }
+            },
+            11: {
+                flower: "Chrysanthemum",
+                image: "images/chrysanthemum.png",
+                message: "Day 11: A beautiful Chrysanthemum. They symbolize loyalty, joy, and deep connection. You are my safe place, and I cherish the beautiful, effortless bond we share.",
+                question: "What kind of person makes you feel truly understood?",
+                theme: {
+                    background: "bg-gradient-to-br from-orange-100 to-rose-50", // Warm, cozy sunset vibe
+                    card: "bg-white/90 backdrop-blur-sm shadow-[0_15px_30px_rgba(234,88,12,0.1)] border-x-4 border-orange-400 rounded-[2rem]", // Unique left & right borders
+                    text: "text-orange-950",
+                    badgeBg: "bg-orange-500 shadow-lg shadow-orange-500/30",
+                    badgeText: "text-white",
+                    fontMsg: "font-elegant text-xl leading-relaxed" 
+                }
+            },
+            12: {
+                flower: "Iris",
+                image: "images/iris.png",
+                message: "Day 12: A striking Iris. These uniquely shaped flowers symbolize wisdom and admiration. I admire so much about you—your mind, your spirit, and the beautiful way you see the world.",
+                question: "What is a topic you could talk about for hours?",
+                theme: {
+                    background: "bg-gradient-to-br from-indigo-50 to-purple-100",
+                    card: "bg-white/90 backdrop-blur-sm shadow-[0_15px_30px_rgba(79,70,229,0.15)] border-l-4 border-indigo-400",
+                    text: "text-indigo-950",
+                    badgeBg: "bg-indigo-600 shadow-lg shadow-indigo-600/30",
+                    badgeText: "text-white",
+                    fontMsg: "font-modern text-lg leading-relaxed"
+                }
+            },
+            13: {
+                flower: "Freesia",
+                image: "images/freesia.png",
+                message: "Day 13: Bright and fragrant Freesias. They represent trust and thoughtfulness. Being with you feels like taking a deep breath of fresh air. I trust you with all my heart.",
+                question: "What is your idea of a perfect, cozy lazy Sunday?",
+                theme: {
+                    background: "bg-gradient-to-r from-yellow-50 to-orange-50",
+                    card: "bg-white shadow-[0_10px_30px_rgba(250,204,21,0.1)] border border-yellow-200 rounded-[2rem]",
+                    text: "text-yellow-900",
+                    badgeBg: "bg-yellow-400 shadow-md shadow-yellow-400/40",
+                    badgeText: "text-yellow-950",
+                    fontMsg: "font-handwriting text-2xl tracking-wide"
+                }
+            },
+            14: {
+                flower: "Zinnia",
+                image: "images/zinnia.png",
+                message: "Day 14: A cheerful, fun Zinnia! These bright blooms are all about endurance and daily affection. Just a sweet reminder that I love you today, tomorrow, and every day after.",
+                question: "What is a silly inside joke of ours that always makes you smile?",
+                theme: {
+                    background: "bg-gradient-to-tr from-pink-100 to-rose-100",
+                    card: "bg-white/95 shadow-[0_20px_40px_rgba(244,63,94,0.15)] border-2 border-pink-300 rounded-3xl",
+                    text: "text-rose-950",
+                    badgeBg: "bg-pink-500 shadow-lg shadow-pink-500/40",
+                    badgeText: "text-white",
+                    fontMsg: "font-elegant text-xl"
+                }
+            },
+            15: {
+                flower: "Lavender",
+                image: "images/lavender.png",
+                message: "Day 15: Calming, beautiful Lavender. Just looking at it brings a sense of peace, and that is exactly how you make me feel. You are my calm in the chaos.",
+                question: "How do you like to be comforted when you're feeling stressed?",
+                theme: {
+                    background: "bg-gradient-to-b from-purple-50 to-fuchsia-50",
+                    card: "bg-white/80 backdrop-blur-md shadow-[0_15px_30px_rgba(168,85,247,0.1)] border-b-4 border-purple-300 rounded-[1.5rem]",
+                    text: "text-purple-950",
+                    badgeBg: "bg-purple-400 shadow-lg shadow-purple-400/30",
+                    badgeText: "text-white",
+                    fontMsg: "font-modern text-lg font-light leading-relaxed"
+                }
+            },
+            16: {
+                flower: "Mogra (Arabian Jasmine)",
+                image: "images/mogra.png",
+                message: "Day 16: Sweet, nostalgic Mogra. Its fragrance is unforgettable and pure. It reminds me of beautiful memories and the intoxicating feeling of falling for you.",
+                question: "What is a scent that always brings back a specific memory for you?",
+                theme: {
+                    background: "bg-gradient-to-br from-emerald-50 to-teal-50",
+                    card: "bg-white/95 shadow-[0_10px_30px_rgba(16,185,129,0.1)] border border-emerald-100 rounded-[2.5rem]",
+                    text: "text-emerald-950",
+                    badgeBg: "bg-emerald-600 shadow-md shadow-emerald-600/30",
+                    badgeText: "text-white",
+                    fontMsg: "font-elegant text-xl italic"
+                }
+            },
+            17: {
+                flower: "Cherry Blossom (Sakura)",
+                image: "images/cherryblossom.png",
+                message: "Day 17: Soft, ethereal Cherry Blossoms. They symbolize the fleeting, beautiful nature of life. It makes me want to cherish every single second I get to spend with you.",
+                question: "If we could pause time for one entire day, what would we do?",
+                theme: {
+                    background: "bg-gradient-to-r from-pink-50 to-rose-50",
+                    card: "bg-white/90 backdrop-blur-sm shadow-[0_20px_50px_rgba(251,113,133,0.15)] border-2 border-dashed border-pink-200 rounded-3xl",
+                    text: "text-rose-900",
+                    badgeBg: "bg-pink-400 shadow-lg shadow-pink-400/40",
+                    badgeText: "text-white",
+                    fontMsg: "font-modern text-lg leading-relaxed"
+                }
+            },
+            18: {
+                flower: "Bluebell",
+                image: "images/bluebell.png",
+                message: "Day 18: Delicate, fairy-tale Bluebells. They symbolize humility and gratitude. I am so endlessly grateful that our paths crossed in this big, crazy world.",
+                question: "Do you believe in fate, or do you think we make our own destiny?",
+                theme: {
+                    background: "bg-gradient-to-tr from-blue-50 to-indigo-100",
+                    card: "bg-white shadow-[0_15px_35px_rgba(59,130,246,0.15)] border-l-4 border-r-4 border-blue-300 rounded-[2rem]",
+                    text: "text-blue-950",
+                    badgeBg: "bg-blue-500 shadow-lg shadow-blue-500/30",
+                    badgeText: "text-white",
+                    fontMsg: "font-handwriting text-2xl"
+                }
+            },
+            19: {
+                flower: "Gardenia",
+                image: "images/gardenia.png",
+                message: "Day 19: Creamy, luxurious Gardenias. They are often associated with secret love or immense joy. My love for you is no secret, but you definitely bring me the purest joy.",
+                question: "What is a small, seemingly insignificant thing that always brightens your day?",
+                theme: {
+                    background: "bg-[#faf9f6]",
+                    card: "bg-white shadow-[0_20px_50px_rgba(168,162,158,0.15)] border border-stone-200 rounded-tr-[3rem] rounded-bl-[3rem]",
+                    text: "text-stone-900",
+                    badgeBg: "bg-stone-500 shadow-lg shadow-stone-500/30",
+                    badgeText: "text-white",
+                    fontMsg: "font-elegant text-xl leading-relaxed"
+                }
+            },
+            20: {
+                flower: "Aster",
+                image: "images/aster.png",
+                message: "Day 20: Tiny, star-like Asters. They are beautiful symbols of love and daintiness. You are the star of my life, bringing beautiful light even when things feel dark.",
+                question: "If you could stargaze with me anywhere in the world, where would we be?",
+                theme: {
+                    background: "bg-gradient-to-b from-indigo-50 to-violet-100",
+                    card: "bg-white/80 backdrop-blur-md shadow-[0_15px_40px_rgba(139,92,246,0.15)] border-t-4 border-indigo-400 rounded-3xl",
+                    text: "text-indigo-950",
+                    badgeBg: "bg-indigo-500 shadow-lg shadow-indigo-500/40",
+                    badgeText: "text-white",
+                    fontMsg: "font-modern text-lg"
+                }
+            },
+            21: {
+                flower: "Kamal (Lotus)",
+                image: "images/lotus.png",
+                message: "Day 21: The serene and striking Kamal. The lotus blooms beautifully even in muddy waters, symbolizing strength and resilience. I admire your incredible strength so much.",
+                question: "What is a challenge you’ve overcome that you are incredibly proud of?",
+                theme: {
+                    background: "bg-gradient-to-br from-pink-50 to-fuchsia-100",
+                    card: "bg-white/90 shadow-[0_20px_50px_rgba(217,70,239,0.15)] border-2 border-pink-200 rounded-full !rounded-3xl",
+                    text: "text-fuchsia-950",
+                    badgeBg: "bg-fuchsia-500 shadow-lg shadow-fuchsia-500/40",
+                    badgeText: "text-white",
+                    fontMsg: "font-elegant text-xl font-medium"
+                }
+            },
+            22: {
+                flower: "Hibiscus",
+                image: "images/hibiscus.png",
+                message: "Day 22: A bold, tropical Hibiscus! They symbolize delicate beauty and vibrant energy. Your energy is contagious, and you make my world so incredibly colorful.",
+                question: "What is the most adventurous thing you want us to do together?",
+                theme: {
+                    background: "bg-gradient-to-tr from-red-50 to-orange-100",
+                    card: "bg-white shadow-[0_15px_30px_rgba(239,68,68,0.15)] border-b-4 border-red-400 rounded-2xl",
+                    text: "text-red-950",
+                    badgeBg: "bg-red-500 shadow-lg shadow-red-500/30",
+                    badgeText: "text-white",
+                    fontMsg: "font-handwriting text-2xl tracking-wide"
+                }
+            },
+            23: {
+                flower: "Bougainvillea",
+                image: "images/bougainvillea.png",
+                message: "Day 23: Vibrant, sprawling Bougainvillea. It’s beautifully chaotic and undeniably stunning. Loving you is an adventure, and I wouldn't trade our vibrant journey for anything.",
+                question: "What is your favorite unexpected adventure we’ve had?",
+                theme: {
+                    background: "bg-gradient-to-br from-fuchsia-100 to-pink-200",
+                    card: "bg-white/95 backdrop-blur-sm shadow-[0_20px_40px_rgba(192,38,211,0.2)] border border-fuchsia-300 rounded-[2.5rem]",
+                    text: "text-fuchsia-950",
+                    badgeBg: "bg-fuchsia-600 shadow-lg shadow-fuchsia-600/40",
+                    badgeText: "text-white",
+                    fontMsg: "font-modern text-lg leading-relaxed"
+                }
+            },
+            24: {
+                flower: "Sweet Pea",
+                image: "images/sweetpea.png",
+                message: "Day 24: The lovely, delicate Sweet Pea. It symbolizes blissful pleasure. Just being near you, holding your hand, or hearing your laugh is my absolute favorite kind of bliss.",
+                question: "What is your favorite way to give and receive affection?",
+                theme: {
+                    background: "bg-gradient-to-b from-pink-50 to-purple-50",
+                    card: "bg-white/90 shadow-[0_10px_30px_rgba(236,72,153,0.1)] border-x-4 border-pink-300 rounded-[2rem]",
+                    text: "text-purple-900",
+                    badgeBg: "bg-pink-400 shadow-md shadow-pink-400/30",
+                    badgeText: "text-white",
+                    fontMsg: "font-elegant text-xl"
+                }
+            },
+            25: {
+                flower: "Plumeria (Champa)",
+                image: "images/plumeria.png",
+                message: "Day 25: A sweet, tropical Plumeria. They symbolize positivity and new beginnings. Every day waking up next to you (or thinking of you) feels like a beautiful new start.",
+                question: "What is a dream or goal you have for us in the next five years?",
+                theme: {
+                    background: "bg-gradient-to-tr from-yellow-50 to-amber-100",
+                    card: "bg-white shadow-[0_15px_40px_rgba(245,158,11,0.15)] border-2 border-yellow-200 rounded-3xl",
+                    text: "text-amber-950",
+                    badgeBg: "bg-yellow-500 shadow-lg shadow-yellow-500/40",
+                    badgeText: "text-white",
+                    fontMsg: "font-handwriting text-2xl"
+                }
+            },
+            26: {
+                flower: "Magnolia",
+                image: "images/magnolia.png",
+                message: "Day 26: The grand, elegant Magnolia. They represent dignity and a love of nature. There is such a graceful, captivating elegance about you that absolutely leaves me in awe.",
+                question: "When do you feel the most confident and beautiful?",
+                theme: {
+                    background: "bg-[#f5f5f4]",
+                    card: "bg-white shadow-[0_20px_50px_rgba(120,113,108,0.15)] border border-stone-200 rounded-[2.5rem]",
+                    text: "text-stone-900",
+                    badgeBg: "bg-stone-600 shadow-lg shadow-stone-600/30",
+                    badgeText: "text-white",
+                    fontMsg: "font-elegant text-xl leading-relaxed"
+                }
+            },
+            27: {
+                flower: "Anemone",
+                image: "images/anemone.png",
+                message: "Day 27: A minimalist and modern Anemone. Its striking dark center represents anticipation. I still get butterflies and look forward to every single moment I get to see you.",
+                question: "What is something we haven’t done yet that you are really looking forward to?",
+                theme: {
+                    background: "bg-gradient-to-b from-gray-50 to-slate-100",
+                    card: "bg-white/95 backdrop-blur-sm shadow-[0_15px_30px_rgba(51,65,85,0.15)] border-b-4 border-slate-800 rounded-3xl",
+                    text: "text-slate-900",
+                    badgeBg: "bg-slate-800 shadow-lg shadow-slate-800/40",
+                    badgeText: "text-white",
+                    fontMsg: "font-modern text-lg font-medium"
+                }
+            },
+            28: {
+                flower: "Dandelion",
+                image: "images/dandelion.png",
+                message: "Day 28: The classic Dandelion. The ultimate 'make a wish' flower. If I blew on a dandelion today, I wouldn't need to wish for anything, because having you is my wish come true.",
+                question: "If you could have three wishes right now, what would they be?",
+                theme: {
+                    background: "bg-gradient-to-tr from-yellow-50 to-stone-100",
+                    card: "bg-white shadow-[0_15px_35px_rgba(253,224,71,0.15)] border border-yellow-200 rounded-[2rem]",
+                    text: "text-stone-800",
+                    badgeBg: "bg-yellow-400 shadow-md shadow-yellow-400/30",
+                    badgeText: "text-stone-900",
+                    fontMsg: "font-handwriting text-2xl tracking-wide"
+                }
+            },
+            29: {
+                flower: "Baby's Breath",
+                image: "images/babysbreath.png",
+                message: "Day 29: Delicate, beautiful Baby's Breath. Often just a filler flower, but incredibly stunning all on its own. It symbolizes everlasting love. My love for you is in all the little details.",
+                question: "What is a small detail about me or our relationship that you love?",
+                theme: {
+                    background: "bg-[#fafafa]",
+                    card: "bg-white shadow-[0_15px_40px_rgba(156,163,175,0.15)] border-2 border-dotted border-gray-300 rounded-[2.5rem]",
+                    text: "text-gray-800",
+                    badgeBg: "bg-gray-400 shadow-lg shadow-gray-400/30",
+                    badgeText: "text-white",
+                    fontMsg: "font-modern text-lg font-light leading-relaxed"
+                }
+            }
+            // Add Day 30 here as you go!
+        };
+
+        // --- 2. DATE-BASED DAY CALCULATOR (ADMIN CONTROLLED) ---
+        // ⚠️ IMPORTANT: Set your campaign start date here! Format: "YYYY-MM-DD"
+        // This is the date when Day 1 should be shown
+        const CAMPAIGN_START_DATE = "2026-04-24"; // Change this to your actual start date!
+        
+        // Optional: Set an admin password to override and view any day (for testing)
+        // Leave empty "" to disable this feature, or set to a password like "cupid123"
+        const ADMIN_PASSWORD = "kami"; 
+
+        // ✨ Calculate which day it should be TODAY (based on calendar date)
+        function calculateCurrentDay() {
+            const today = new Date();
+            today.setHours(0, 0, 0, 0); // Reset time to midnight for accurate day calculation
+            
+            const startDate = new Date(CAMPAIGN_START_DATE);
+            startDate.setHours(0, 0, 0, 0); // Reset time to midnight
+            
+            // Calculate the difference in milliseconds, then convert to days
+            const timeDifference = today - startDate;
+            const daysPassed = Math.floor(timeDifference / (1000 * 60 * 60 * 24));
+            
+            // Day 1 is on the start date, so add 1
+            const calculatedDay = daysPassed + 1;
+            
+            return calculatedDay;
+        }
+
+        // Check if admin password is provided (for override/cheating!)
+        const urlParams = new URLSearchParams(window.location.search);
+        const adminAttempt = urlParams.get('admin');
+        const dayFromUrl = parseInt(urlParams.get('day'));
+        
+        let currentDay;
+        let isAdminAccess = false;
+
+        // If admin password is set and provided, allow override FIRST (skip date calculations)
+        if (ADMIN_PASSWORD && adminAttempt === ADMIN_PASSWORD && dayFromUrl && flowerData[dayFromUrl]) {
+            currentDay = dayFromUrl;
+            isAdminAccess = true;
+        } else {
+            // Otherwise, use date-based calculation
+            currentDay = calculateCurrentDay();
+            
+            // Block access to future days (unless today hasn't arrived yet for Day 1)
+            if (currentDay < 1) {
+                currentDay = "coming_soon";
+            } else if (currentDay > 30) {
+                currentDay = 30; // Campaign ended, show final day
+            }
+        }
+
+        let data = null;
+        let blockedMessage = false;
+
+        if (currentDay === "coming_soon") {
+            blockedMessage = "The campaign hasn't started yet! Check back soon. 🌸";
+        } else if (typeof currentDay === 'number' && !flowerData[currentDay]) {
+            currentDay = 30; // Fallback to last day if somehow invalid
+            data = flowerData[currentDay];
+        } else {
+            data = flowerData[currentDay];
+        }
+
+        // --- 3. UPDATE THE WEBSITE ---
+        window.addEventListener('DOMContentLoaded', () => {
+            
+            // ⚠️ If access is blocked (future day requested), show locked message
+            if (blockedMessage) {
+                const card = document.getElementById('card-container');
+                const body = document.getElementById('app-body');
+                
+                body.className = 'min-h-screen flex items-center justify-center p-4 bg-gradient-to-br from-rose-50 to-pink-100 text-rose-900 font-modern';
+                card.innerHTML = `
+                    <div class="text-center">
+                        <div class="text-6xl mb-4">🔒</div>
+                        <h1 class="text-3xl md:text-4xl font-elegant font-bold mb-4">Not Available Yet</h1>
+                        <p class="text-lg mb-6">${blockedMessage}</p>
+                        <div class="text-sm opacity-70">
+                            <p>Current Date: <strong>${new Date().toLocaleDateString()}</strong></p>
+                            <p>Campaign Started: <strong>${new Date(CAMPAIGN_START_DATE).toLocaleDateString()}</strong></p>
+                        </div>
+                    </div>
+                `;
+                return; // Exit early, don't load the flower
+            }
+            
+            // Update Text
+            document.getElementById('day-number').innerText = currentDay;
+            document.getElementById('flower-name').innerText = data.flower;
+            
+            const msgElement = document.getElementById('love-message');
+            msgElement.innerText = data.message;
+            msgElement.className = `leading-relaxed mb-6 ${data.theme.fontMsg}`; // Apply specific font
+            
+            // Update Image
+            document.getElementById('flower-image').src = data.image;
+
+            // Update Progress Indicator
+            document.getElementById('progress-text').innerText = `Day ${currentDay} of 30`;
+            
+            // Add a tiny delay so the progress bar smoothly animates from 0% when the page loads
+            setTimeout(() => {
+                const progressPercentage = (currentDay / 30) * 100;
+                document.getElementById('progress-fill').style.width = `${progressPercentage}%`;
+            }, 100);
+
+            // Update Daily Question
+            document.getElementById('daily-question').innerText = data.question || "What made you smile today?";
+
+            // Apply Themes (Colors)
+            const body = document.getElementById('app-body');
+            const card = document.getElementById('card-container');
+            const badge = document.getElementById('day-badge');
+
+            // Reset old classes and apply new ones
+            body.className = `min-h-screen flex items-center justify-center p-4 transition-colors duration-1000 ${data.theme.background} ${data.theme.text}`;
+            card.className = `relative max-w-md w-full rounded-3xl p-6 md:p-8 transform transition-all duration-1000 ease-out translate-y-0 opacity-100 ${data.theme.card}`;
+            badge.className = `absolute -top-4 -left-4 md:-left-6 rounded-full h-16 w-16 flex flex-col items-center justify-center shadow-lg transform rotate-[-10deg] ${data.theme.badgeBg} ${data.theme.badgeText}`;
+
+            // Trigger confetti if it's Day 30, OR a special mini-burst for Women's Day!
+            if (currentDay === 30) {
+                setTimeout(shootConfetti, 500);
+            } else if (currentDay === 8) {
+                setTimeout(shootMiniConfetti, 600); // Surprise!
+            }
+        });
+
+        // Mini Confetti for Women's Day
+        function shootMiniConfetti() {
+            confetti({
+                particleCount: 150,
+                spread: 80,
+                origin: { y: 0.6 },
+                colors: ['#c026d3', '#db2777', '#a855f7', '#ffffff'] // Purple, Pink, Fuchsia
+            });
+        }
+
+        // Confetti Function for the finale
+        function shootConfetti() {
+            var duration = 3 * 1000;
+            var animationEnd = Date.now() + duration;
+            var defaults = { startVelocity: 30, spread: 360, ticks: 60, zIndex: 0 };
+
+            function randomInRange(min, max) {
+                return Math.random() * (max - min) + min;
+            }
+
+            var interval = setInterval(function() {
+                var timeLeft = animationEnd - Date.now();
+                if (timeLeft <= 0) { return clearInterval(interval); }
+                var particleCount = 50 * (timeLeft / duration);
+                
+                confetti(Object.assign({}, defaults, { particleCount, origin: { x: randomInRange(0.1, 0.3), y: Math.random() - 0.2 } }));
+                confetti(Object.assign({}, defaults, { particleCount, origin: { x: randomInRange(0.7, 0.9), y: Math.random() - 0.2 } }));
+            }, 250);
+        }
+    </script>
+</body>
+</html>
